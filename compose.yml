@@ -1,0 +1,53 @@
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "1001:80"
+    volumes:
+      - ./code:/var/www/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - ceo_ioana_php_web
+
+  ceo_ioana:
+    #image: ceo_ioana:latest
+    build:
+      context: ./build/php
+      additional_contexts:
+        resource_code: ./code
+      args:
+        PHP_VERSION: "8.5-fpm"
+    networks:
+      - ceo_ioana_web_db
+      - ceo_ioana_php_web
+    expose:
+      - 9000
+    ports:
+      - "5182:5182"
+    volumes:
+      - ./code:/var/www/html
+      - ./build/php/php.ini:/usr/local/etc/php/conf.d/php_custom.ini
+
+  db_postgres:
+    image: postgres
+    #size of share memory in /dev/shm allocated for building docker image
+    shm_size: 5mb
+    ports:
+        - "5442:5432"
+    networks:
+      - ceo_ioana_web_db
+    env_file:
+      - ./prod.env
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - ceo_ioana_db_postgres_volume:/var/lib/postgresql/data
+
+networks:
+  ceo_ioana_php_web:
+    driver: bridge
+  ceo_ioana_web_db:
+    driver: bridge
+
+volumes:
+  ceo_ioana_db_postgres_volume:
