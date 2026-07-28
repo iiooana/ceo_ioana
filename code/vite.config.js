@@ -9,16 +9,16 @@ export default defineConfig(({mode}) => {
 
     return {
         server:  {
-            host: '0.0.0.0', //request from all
+            host: "0.0.0.0", //request from all
             port: env.VITE_PORT || 5175,
             strictPort: true,
             hmr: {
-                host: '172.0.0.1',
+                host: "127.0.0.1",
                 port: env.VITE_PORT || 5175
             },
             watch: {
-                ignored: ['**/storage/framework/views/**']
-            }
+                ignored: ['**/storage/framework/views/**'],
+            },
         },
         plugins: [
             laravel({

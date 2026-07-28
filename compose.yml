@@ -10,7 +10,7 @@ services:
       - ceo_ioana_php_web
 
   ceo_ioana:
-    #image: ceo_ioana:latest
+    image: ceo_ioana:latest
     build:
       context: ./build/php
       additional_contexts:
