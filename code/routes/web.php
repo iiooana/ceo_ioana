@@ -6,16 +6,35 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    $todayActivities = Activity::whereDate('starts_at', today())->whereNotNull(['starts_at','ends_at'])->get();
+    $rangeStart = today()->subDays(6)->startOfDay();
 
-    $totalMinutes = $todayActivities->sum(
-        fn (Activity $activity) => $activity->starts_at->diffInMinutes($activity->ends_at)
-    );
+    $activitiesByDate = Activity::whereDate('starts_at', '>=', $rangeStart)
+        ->whereNotNull(['starts_at', 'ends_at'])
+        ->get()
+        ->groupBy(fn (Activity $activity) => $activity->starts_at->toDateString());
+
+    $last7Days = collect(range(0, 6))->map(function (int $daysAgo) use ($activitiesByDate) {
+        $date = today()->subDays($daysAgo);
+        $dayActivities = $activitiesByDate->get($date->toDateString(), collect());
+
+        $totalMinutes = $dayActivities->sum(
+            fn (Activity $activity) => $activity->starts_at->diffInMinutes($activity->ends_at)
+        );
+
+        return [
+            'label' => match ($daysAgo) {
+                0 => 'Today',
+                1 => 'Yesterday',
+                default => $date->format('l'),
+            },
+            'date' => $date->format('l, F j, Y'),
+            'count' => $dayActivities->count(),
+            'duration' => sprintf('%dh %dm', intdiv($totalMinutes, 60), $totalMinutes % 60),
+        ];
+    });
 
     return Inertia::render('Dashboard', [
-        'today' => today()->format('l, F j, Y'),
-        'todayActivitiesCount' => $todayActivities->count(),
-        'todayActivitiesDuration' => sprintf('%dh %dm', intdiv($totalMinutes, 60), $totalMinutes % 60),
+        'last7Days' => $last7Days,
     ]);
 })->name('dashboard');
 

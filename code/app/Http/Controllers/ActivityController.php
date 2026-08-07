@@ -16,7 +16,7 @@ class ActivityController extends Controller
     public function index(): Response
     {
         return Inertia::render('Activities/Index', [
-            'activities' => Activity::orderBy('starts_at','desc')->get(),
+            'activities' => Activity::orderBy('starts_at','desc')->limit(15)->get(),
         ]);
     }
 
