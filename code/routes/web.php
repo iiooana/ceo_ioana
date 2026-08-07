@@ -6,14 +6,14 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    $rangeStart = today()->subDays(6)->startOfDay();
+    $rangeStart = today()->subDays(14)->startOfDay();
 
     $activitiesByDate = Activity::whereDate('starts_at', '>=', $rangeStart)
         ->whereNotNull(['starts_at', 'ends_at'])
         ->get()
         ->groupBy(fn (Activity $activity) => $activity->starts_at->toDateString());
 
-    $last7Days = collect(range(0, 6))->map(function (int $daysAgo) use ($activitiesByDate) {
+    $last7Days = collect(range(0, 14))->map(function (int $daysAgo) use ($activitiesByDate) {
         $date = today()->subDays($daysAgo);
         $dayActivities = $activitiesByDate->get($date->toDateString(), collect());
 
