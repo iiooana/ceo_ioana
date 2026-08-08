@@ -30,6 +30,8 @@ Route::get('/', function () {
             'date' => $date->format('l, F j, Y'),
             'count' => $dayActivities->count(),
             'duration' => sprintf('%dh %dm', intdiv($totalMinutes, 60), $totalMinutes % 60),
+            'firstStartsAt' => $dayActivities->min('starts_at')?->format('g:i A'),
+            'lastEndsAt' => $dayActivities->max('ends_at')?->format('g:i A'),
         ];
     });
 
