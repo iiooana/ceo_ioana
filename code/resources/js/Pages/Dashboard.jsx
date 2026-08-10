@@ -1,12 +1,14 @@
 import AppLayout from '../Layouts/AppLayout';
 
-export default function Dashboard({ last7Days }) {
+export default function Dashboard({ lastDays, hoursLastWeek, hoursWeekBefore }) {
     return (
         <AppLayout>
-            <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+            <h1 className="text-2xl font-semibold text-gray-900 mb-2">Dashboard</h1>
+            <p>Last 7 days: <strong>{hoursLastWeek}</strong></p>
+            <p>Week before: <strong>{hoursWeekBefore}</strong></p>
 
             <div className="mt-4 flex flex-wrap gap-4">
-                {last7Days.map((day) => (
+                {lastDays.map((day) => (
                     <div key={day.date} className="w-xs rounded-md border border-gray-200 bg-white p-4">
                         <h2 className="text-sm font-medium text-gray-500">{day.label} - {day.firstStartsAt} - {day.lastEndsAt}</h2>
                         <p className="mt-1 text-sm text-gray-600">{day.date}</p>
