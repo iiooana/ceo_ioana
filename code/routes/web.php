@@ -1,9 +1,13 @@
 <?php
 
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\HabitController;
+use App\Http\Controllers\TrackHabitController;
 use App\Models\Activity;
+use App\Models\TrackHabit;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Models\Habit;
 
 Route::get('/', function () {
     $rangeStart = today()->subDays(14)->startOfDay();
@@ -15,7 +19,7 @@ Route::get('/', function () {
 
     $totalMinutesWeek = ["lastWeek" => 0,"weekBefore" => 0];
 
-    $lastDays = collect(range(0, 14))->map(function (int $daysAgo) use ($activitiesByDate, &$totalMinutesWeek) {
+    $lastDays = collect(range(0, 15))->map(function (int $daysAgo) use ($activitiesByDate, &$totalMinutesWeek) {
         $date = today()->subDays($daysAgo);
         $dayActivities = $activitiesByDate->get($date->toDateString(), collect());
 
@@ -25,9 +29,9 @@ Route::get('/', function () {
 
 
         //dump("daysAgo",$daysAgo,$totalMinutes);
-        if ($daysAgo < 8){
+        if ($daysAgo > 0 && $daysAgo <= 7){
             $totalMinutesWeek['lastWeek']+= $totalMinutes;
-        }else {
+        }else if($daysAgo > 7) {
             $totalMinutesWeek['weekBefore']+= $totalMinutes;
         }
 
@@ -45,12 +49,37 @@ Route::get('/', function () {
         ];
     });
 
+    $monthStart = today()->startOfMonth();
+
+    $days = collect(range(1, today()->daysInMonth))->map(
+        fn (int $day) => $monthStart->copy()->day($day)->format('Y-m-d')
+    );
+
+    $trackHabitsByHabitAndDate = TrackHabit::whereBetween('created_at', [$monthStart, $monthStart->copy()->endOfMonth()])
+        ->get()
+        ->groupBy(fn (TrackHabit $trackHabit) => $trackHabit->habit_id.'-'.$trackHabit->created_at->format('Y-m-d'));
+
+    $habitGrid = Habit::orderBy('order')->get()->map(function (Habit $habit) use ($days, $trackHabitsByHabitAndDate) {
+        return [
+            'id' => $habit->id,
+            'name' => $habit->name,
+            'color' => $habit->color,
+            'tracks' => $days->mapWithKeys(function (string $date) use ($habit, $trackHabitsByHabitAndDate) {
+                return [$date => $trackHabitsByHabitAndDate->get("{$habit->id}-{$date}")?->first()?->id];
+            }),
+        ];
+    });
+
     //dd($totalMinutesWeek);
     return Inertia::render('Dashboard', [
         'lastDays' => $lastDays,
         'hoursLastWeek' => sprintf("%dh %dm", intdiv($totalMinutesWeek['lastWeek'], 60), $totalMinutesWeek['lastWeek'] % 60),
-        'hoursWeekBefore' => sprintf("%dh %dm", intdiv($totalMinutesWeek['weekBefore'], 60), $totalMinutesWeek['weekBefore'] % 60)
+        'hoursWeekBefore' => sprintf("%dh %dm", intdiv($totalMinutesWeek['weekBefore'], 60), $totalMinutesWeek['weekBefore'] % 60),
+        'days' => $days,
+        'habitGrid' => $habitGrid,
     ]);
 })->name('dashboard');
 
 Route::resource('activities', ActivityController::class)->only(['index', 'store', 'update']);
+Route::resource('habits',HabitController::class)->only(['index','store','update']);
+Route::resource('track-habits', TrackHabitController::class)->only(['store', 'destroy']);

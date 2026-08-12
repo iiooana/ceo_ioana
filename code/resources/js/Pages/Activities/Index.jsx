@@ -1,16 +1,8 @@
 import { useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import AppLayout from '../../Layouts/AppLayout';
+import { toDatetimeLocalValue, formatDateTime } from '../../Utils/toDatetimeLocalValue.js';
 
-function formatDateTime(value, timeZone) {
-    return value ? new Date(value).toLocaleString(undefined, { timeZone }) : '—';
-}
-
-function toDatetimeLocalValue(date) {
-    const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-
-    return local.toISOString().slice(0, 16);
-}
 
 function formatDuration(startsAt, endsAt) {
     if (!startsAt || !endsAt) {
@@ -65,7 +57,7 @@ function ActivityForm({ activity, onCancel }) {
     return (
         <form onSubmit={submit} className="mt-4 space-y-4 rounded-md border border-gray-200 bg-white p-4">
             <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="title" className="block">
                     Title
                 </label>
                 <input
@@ -73,9 +65,9 @@ function ActivityForm({ activity, onCancel }) {
                     type="text"
                     value={data.title}
                     onChange={(e) => setData('title', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
+                    className="mt-1"
                 />
-                {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
+                {errors.title && <p className="mt-1 error">{errors.title}</p>}
             </div>
 
             <div>
@@ -116,7 +108,7 @@ function ActivityForm({ activity, onCancel }) {
                         type="datetime-local"
                         value={data.ends_at}
                         onChange={(e) => setData('ends_at', e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
+                        className="mt-1"
                     />
                     {errors.ends_at && <p className="mt-1 text-sm text-red-600">{errors.ends_at}</p>}
                 </div>
@@ -126,15 +118,13 @@ function ActivityForm({ activity, onCancel }) {
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                    className="cancel"
                 >
                     Cancel
                 </button>
                 <button
                     type="submit"
-                    disabled={processing}
-                    className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
-                >
+                    disabled={processing} >
                     Save
                 </button>
             </div>
@@ -165,13 +155,11 @@ export default function Index({ activities }) {
     return (
         <AppLayout>
             <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-semibold text-gray-900">Activities</h1>
+                <h1>Activities</h1>
                 {!showForm && (
                     <button
                         type="button"
-                        onClick={openCreateForm}
-                        className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500"
-                    >
+                        onClick={openCreateForm} >
                         Add Activity
                     </button>
                 )}
@@ -180,7 +168,7 @@ export default function Index({ activities }) {
             {showForm && <ActivityForm activity={editingActivity} onCancel={closeForm} />}
 
             {activities.length === 0 ? (
-                <p className="mt-4 text-sm text-gray-500">No activities yet.</p>
+                <p className="mt-4">No activities yet.</p>
             ) : (
                 <ul className="mt-4 divide-y divide-gray-200 rounded-md border border-gray-200 bg-white">
                     {activities.map((activity) => (
@@ -200,7 +188,7 @@ export default function Index({ activities }) {
                                     <button
                                         type="button"
                                         onClick={() => openEditForm(activity)}
-                                        className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+                                        className="transparent"
                                     >
                                         Edit
                                     </button>

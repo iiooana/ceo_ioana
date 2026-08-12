@@ -18,6 +18,8 @@ export default defineConfig(({mode}) => {
             },
             watch: {
                 ignored: ['**/storage/framework/views/**'],
+                usePolling: true,
+                interval: 300
             },
         },
         plugins: [

@@ -3,6 +3,7 @@ import { Link, usePage } from '@inertiajs/react';
 const navigation = [
     { name: 'Dashboard', href: '/' },
     { name: 'Activities', href: '/activities' },
+    { name: 'Habits', href: '/habits'}
 ];
 
 export default function AppLayout({ children }) {
@@ -19,7 +20,7 @@ export default function AppLayout({ children }) {
                             </div>
                             <div className="flex space-x-4 sm:ml-6">
                                 {navigation.map((item) => {
-                                    const isActive = url.startsWith(item.href);
+                                    const isActive = ( item.name.toLowerCase() !== 'dashboard' && url !== "/" && url.startsWith(item.href) ) || (url === "/" && item.name.toLowerCase() === 'dashboard') ;
 
                                     return (
                                         <Link

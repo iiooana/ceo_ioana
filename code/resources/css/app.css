@@ -7,3 +7,58 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+@layer base {
+
+    html, body {
+        @apply antialiased
+    }
+
+    *, *::before, *::after {
+        @apply transition-all ease-linear duration-250 delay-50
+    }
+
+    h1 {
+        @apply text-2xl font-semibold text-gray-900
+    }
+    p {
+        @apply text-sm text-gray-500
+    }
+    label {
+        @apply text-sm font-medium text-gray-700
+    }
+    input[type="text"] {
+        @apply block w-full rounded-md border-gray-300 shadow-sm sm:text-sm min-h-[20px]
+    }
+    input[type="number"] {
+        @apply block rounded-md border-gray-300 shadow-sm sm:text-sm min-h-[20px]
+    }
+    input[type="datetime-local"]
+    {
+        @apply block w-full rounded-md border-gray-300 shadow-sm sm:text-sm
+    }
+    button {
+        @apply cursor-pointer rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50
+    }
+}
+
+@layer components {
+    p {
+        &.error {
+            @apply text-sm text-red-600
+        }
+    }
+    button
+    {
+        &.transparent {
+            @apply bg-transparent p-1  text-sm font-medium text-indigo-600 hover:text-indigo-500
+        }
+        &.cancel {
+            @apply rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 bg-white
+        }
+    }
+}
+
+@layer utilities {
+
+}
