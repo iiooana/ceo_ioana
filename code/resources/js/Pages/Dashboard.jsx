@@ -1,5 +1,6 @@
 import { router } from '@inertiajs/react';
 import AppLayout from '../Layouts/AppLayout';
+import {useRef} from "react";
 
 function toggleTrack(habitId, date, trackId) {
     if (trackId) {
@@ -8,14 +9,27 @@ function toggleTrack(habitId, date, trackId) {
         router.post('/track-habits', { habit_id: habitId, date }, { preserveScroll: true });
     }
 }
-
 function HabitGrid({ days, habitGrid }) {
+
+    function hoverRow(habitId,container)
+    {
+        const elements = container.current.querySelectorAll(".group\\/habits");
+        elements.forEach( item => {
+            item.classList.remove('active')
+            if(item.getAttribute('data-habit') == habitId){
+              item.classList.add('active')
+            }
+        })
+    }
+
+
+    const container = useRef(null)
     if (habitGrid.length === 0) {
         return <p className="mt-4">No habits yet.</p>;
     }
 
     return (
-        <div className="mt-4 overflow-x-auto rounded-md border border-gray-200 bg-white">
+        <div ref={container} className="mt-4 overflow-x-auto rounded-md border border-gray-200 bg-white">
             <table className="border-collapse">
                 <thead>
                     <tr>
@@ -33,8 +47,8 @@ function HabitGrid({ days, habitGrid }) {
                         const total = days.filter((date) => habit.tracks[date]).length;
 
                         return (
-                            <tr key={habit.id} className="border-t border-gray-100">
-                                <td className="sticky left-0 whitespace-nowrap bg-white p-2 text-sm font-medium text-gray-900">
+                            <tr key={habit.id} data-habit={habit.id} className="border-t border-gray-100 group/habits [&.active]:bg-black/15">
+                                <td className="sticky left-0 whitespace-nowrap bg-white p-2 text-sm font-medium group-[&.active]/habits:font-bold text-gray-900 ">
                                     {habit.name}
                                 </td>
                                 {days.map((date) => {
@@ -44,6 +58,7 @@ function HabitGrid({ days, habitGrid }) {
                                         <td key={date} className="p-1 text-center">
                                             <button
                                                 type="button"
+                                                onMouseEnter={() => hoverRow(habit.id,container) }
                                                 onClick={() => toggleTrack(habit.id, date, trackId)}
                                                 className="h-6 w-6 rounded"
                                                 style={{
