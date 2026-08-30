@@ -195,7 +195,7 @@ export default function Index({ activities }) {
                                 </div>
                             </div>
                             {activity.description && (
-                                <p className="mt-1 text-sm text-gray-600">{activity.description}</p>
+                                <div className="mt-1 whitespace-pre-line text-sm text-gray-600">{activity.description}</div>
                             )}
                         </li>
                     ))}
