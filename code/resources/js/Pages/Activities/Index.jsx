@@ -78,7 +78,7 @@ function ActivityForm({ activity, onCancel }) {
                     id="description"
                     value={data.description}
                     onChange={(e) => setData('description', e.target.value)}
-                    rows={3}
+                    rows={10}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
                 />
                 {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
@@ -152,6 +152,9 @@ export default function Index({ activities }) {
         setShowForm(false);
     }
 
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
     return (
         <AppLayout>
             <div className="flex items-center justify-between">
@@ -172,7 +175,13 @@ export default function Index({ activities }) {
             ) : (
                 <ul className="mt-4 divide-y divide-gray-200 rounded-md border border-gray-200 bg-white">
                     {activities.map((activity) => (
-                        <li key={activity.id} className="p-4">
+                        <li key={activity.id} className={`p-4 bg-radial ${activity.starts_at &&
+                        yesterday.getDate() === ( new Date(activity.starts_at)).getDate() &&
+                            yesterday.getMonth() === ( new Date(activity.starts_at)).getMonth() &&
+                            yesterday.getFullYear() === ( new Date(activity.starts_at)).getFullYear()
+                            ? 'to-sky-200 from-white'
+                            :
+                            ''}`}>
                             <div className="flex items-baseline justify-between">
                                 <h2 className="font-medium text-gray-900">{activity.title}</h2>
                                 <div className="flex items-center gap-3">
