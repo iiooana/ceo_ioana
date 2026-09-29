@@ -70,11 +70,18 @@ Route::get('/', function () {
         ];
     });
 
+    //region AVG
+    $totalMinutesWeek['avgLastWeek'] = $totalMinutesWeek['lastWeek']/7;
+    $totalMinutesWeek['avgWeekBefore'] = $totalMinutesWeek['weekBefore']/7;
+    //endregion
+
     //dd($totalMinutesWeek);
     return Inertia::render('Dashboard', [
         'lastDays' => $lastDays,
         'hoursLastWeek' => sprintf("%dh %dm", intdiv($totalMinutesWeek['lastWeek'], 60), $totalMinutesWeek['lastWeek'] % 60),
+        'avgHoursLastWeek' => sprintf("%dh %dm", intdiv($totalMinutesWeek['avgLastWeek'], 60), $totalMinutesWeek['avgLastWeek'] % 60),
         'hoursWeekBefore' => sprintf("%dh %dm", intdiv($totalMinutesWeek['weekBefore'], 60), $totalMinutesWeek['weekBefore'] % 60),
+        'avgHoursWeekBefore' => sprintf("%dh %dm", intdiv($totalMinutesWeek['avgWeekBefore'], 60), $totalMinutesWeek['avgWeekBefore'] % 60),
         'days' => $days,
         'habitGrid' => $habitGrid,
     ]);

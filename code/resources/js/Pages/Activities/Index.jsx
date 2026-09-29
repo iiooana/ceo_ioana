@@ -78,7 +78,7 @@ function ActivityForm({ activity, onCancel }) {
                     id="description"
                     value={data.description}
                     onChange={(e) => setData('description', e.target.value)}
-                    rows={10}
+                    rows={20}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
                 />
                 {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
