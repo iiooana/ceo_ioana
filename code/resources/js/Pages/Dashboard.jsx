@@ -78,11 +78,14 @@ function HabitGrid({ days, habitGrid }) {
     );
 }
 
-export default function Dashboard({ lastDays, hoursLastWeek,avgHoursLastWeek, hoursWeekBefore,avgHoursWeekBefore, days, habitGrid }) {
+export default function Dashboard({ lastDays, hoursLastSixDaysAndToday, avgHoursLastSixDaysAndToday, hoursLastWeek,avgHoursLastWeek, hoursLastWeekWithoutYesterday, avgHoursLastWeekWithoutYesterday,hoursWeekBefore,avgHoursWeekBefore, days, habitGrid }) {
     return (
         <AppLayout>
             <h1 className="text-2xl font-semibold text-gray-900 mb-2">Dashboard</h1>
+
+            <p>Last 6 days + today: <strong>{hoursLastSixDaysAndToday}</strong> ~ AVG {avgHoursLastSixDaysAndToday}</p>
             <p>Last 7 days: <strong>{hoursLastWeek}</strong> ~ AVG {avgHoursLastWeek}</p>
+            <p>Last 2-8 days: <strong>{hoursLastWeekWithoutYesterday}</strong> ~ AVG {avgHoursLastWeekWithoutYesterday}</p>
             <p>Week before: <strong>{hoursWeekBefore}</strong> ~ AVG {avgHoursWeekBefore}</p>
 
             <HabitGrid days={days} habitGrid={habitGrid} />

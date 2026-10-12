@@ -17,7 +17,7 @@ Route::get('/', function () {
         ->get()
         ->groupBy(fn (Activity $activity) => $activity->starts_at->toDateString());
 
-    $totalMinutesWeek = ["lastWeek" => 0,"weekBefore" => 0];
+    $totalMinutesWeek = ["lastWeek" => 0,"weekBefore" => 0,"lastSixDaysAndToday" => 0,"lastWeekWithoutYesterday" => 0];
 
     $lastDays = collect(range(0, 15))->map(function (int $daysAgo) use ($activitiesByDate, &$totalMinutesWeek) {
         $date = today()->subDays($daysAgo);
@@ -29,6 +29,14 @@ Route::get('/', function () {
 
 
         //dump("daysAgo",$daysAgo,$totalMinutes);
+        if ($daysAgo <= 6) {
+            $totalMinutesWeek['lastSixDaysAndToday'] += $totalMinutes;
+        }
+
+        if ($daysAgo >= 2 && $daysAgo <= 8) {
+            $totalMinutesWeek['lastWeekWithoutYesterday'] += $totalMinutes;
+        }
+
         if ($daysAgo > 0 && $daysAgo <= 7){
             $totalMinutesWeek['lastWeek']+= $totalMinutes;
         }else if($daysAgo > 7) {
@@ -73,13 +81,19 @@ Route::get('/', function () {
     //region AVG
     $totalMinutesWeek['avgLastWeek'] = $totalMinutesWeek['lastWeek']/7;
     $totalMinutesWeek['avgWeekBefore'] = $totalMinutesWeek['weekBefore']/7;
+    $totalMinutesWeek['avgLastSixDaysAndToday'] = intdiv($totalMinutesWeek['lastSixDaysAndToday'], 7);
+    $totalMinutesWeek['avgLastWeekWithoutYesterday'] = intdiv($totalMinutesWeek['lastWeekWithoutYesterday'], 7);
     //endregion
 
     //dd($totalMinutesWeek);
     return Inertia::render('Dashboard', [
         'lastDays' => $lastDays,
+        'hoursLastSixDaysAndToday' => sprintf("%dh %dm", intdiv($totalMinutesWeek['lastSixDaysAndToday'], 60), $totalMinutesWeek['lastSixDaysAndToday'] % 60),
+        'avgHoursLastSixDaysAndToday' => sprintf("%dh %dm", intdiv($totalMinutesWeek['avgLastSixDaysAndToday'], 60), $totalMinutesWeek['avgLastSixDaysAndToday'] % 60),
         'hoursLastWeek' => sprintf("%dh %dm", intdiv($totalMinutesWeek['lastWeek'], 60), $totalMinutesWeek['lastWeek'] % 60),
         'avgHoursLastWeek' => sprintf("%dh %dm", intdiv($totalMinutesWeek['avgLastWeek'], 60), $totalMinutesWeek['avgLastWeek'] % 60),
+        'hoursLastWeekWithoutYesterday' => sprintf("%dh %dm", intdiv($totalMinutesWeek['lastWeekWithoutYesterday'], 60), $totalMinutesWeek['lastWeekWithoutYesterday'] % 60),
+        'avgHoursLastWeekWithoutYesterday' => sprintf("%dh %dm", intdiv($totalMinutesWeek['avgLastWeekWithoutYesterday'], 60), $totalMinutesWeek['avgLastWeekWithoutYesterday'] % 60),
         'hoursWeekBefore' => sprintf("%dh %dm", intdiv($totalMinutesWeek['weekBefore'], 60), $totalMinutesWeek['weekBefore'] % 60),
         'avgHoursWeekBefore' => sprintf("%dh %dm", intdiv($totalMinutesWeek['avgWeekBefore'], 60), $totalMinutesWeek['avgWeekBefore'] % 60),
         'days' => $days,
